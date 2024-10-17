@@ -26,6 +26,7 @@ struct ContentViewFeature: Reducer {
         var modelContext: ModelContext?
         var isOffline: Bool = false
         var hasNoCachedData: Bool = true
+        var isAPIKeyMissing: Bool = false
 
         static func == (lhs: State, rhs: State) -> Bool {
             lhs.hasAttemptedWeatherFetch == rhs.hasAttemptedWeatherFetch &&
@@ -36,7 +37,8 @@ struct ContentViewFeature: Reducer {
             lhs.statusMessage == rhs.statusMessage &&
             lhs.storyImages == rhs.storyImages &&
             lhs.isOffline == rhs.isOffline &&
-            lhs.hasNoCachedData == rhs.hasNoCachedData
+            lhs.hasNoCachedData == rhs.hasNoCachedData &&
+            lhs.isAPIKeyMissing == rhs.isAPIKeyMissing
         }
     }
 
@@ -59,13 +61,18 @@ struct ContentViewFeature: Reducer {
         case weatherFetched(CachedWeatherData?)
         case setOfflineStatus(Bool)
         case setHasNoCachedData(Bool)
+        case checkAPIKeyStatus
+        case setAPIKeyStatus(Bool)
     }
 
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
             case .onAppear:
-                return .send(.initializeLocationManager)
+                return .concatenate(
+                    .send(.initializeLocationManager),
+                    .send(.checkAPIKeyStatus)
+                )
 
             case .initializeLocationManager:
                 if state.locationManager == nil {
@@ -166,6 +173,9 @@ struct ContentViewFeature: Reducer {
                 return .none
 
             case .loadWeatherData:
+                if state.isAPIKeyMissing {
+                    return .none
+                }
                 if state.networkMonitor.isConnected {
                     if !state.hasAttemptedWeatherFetch {
                         state.hasAttemptedWeatherFetch = true
@@ -217,6 +227,14 @@ struct ContentViewFeature: Reducer {
                 } else {
                     print("Failed to fetch weather data")
                 }
+                return .none
+
+            case .checkAPIKeyStatus:
+                let isAPIKeyMissing = Config.weatherAPIKey == nil
+                return .send(.setAPIKeyStatus(isAPIKeyMissing))
+
+            case let .setAPIKeyStatus(isMissing):
+                state.isAPIKeyMissing = isMissing
                 return .none
             }
         }

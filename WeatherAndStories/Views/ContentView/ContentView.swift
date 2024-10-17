@@ -72,7 +72,12 @@ struct ContentView: View {
 
     private func weatherView(viewStore: ViewStore<ContentViewFeature.State, ContentViewFeature.Action>) -> some View {
         ZStack {
-            if viewStore.isOffline && viewStore.hasNoCachedData {
+            if viewStore.isAPIKeyMissing {
+                Text("Obtain an OpenWeatherMap API Key")
+                    .font(.headline)
+                    .foregroundColor(.red)
+                    .padding()
+            } else if viewStore.isOffline && viewStore.hasNoCachedData {
                 Text("Offline: No cached data available")
                     .font(.headline)
                     .foregroundColor(.gray)

@@ -169,4 +169,84 @@ struct ContentViewFeatureTests {
 
         await store.finish()
     }
+
+    @Test
+    func testMissingAPIKey() async throws {
+        let store = TestStore(initialState: ContentViewFeature.State(
+            weatherViewModel: WeatherViewModel(),
+            hasNoCachedData: true,
+            isAPIKeyMissing: true  // Start with isAPIKeyMissing as true
+        )) {
+            ContentViewFeature()
+        }
+
+        // Disable exhaustivity
+        store.exhaustivity = .off
+
+        // Simulate app launch
+        await store.send(.onAppear)
+
+        // Check the state after onAppear
+        #expect(store.state.isAPIKeyMissing, "API key should be missing initially")
+        #expect(!store.state.showWeather, "Weather should not be shown when API key is missing")
+        #expect(!store.state.isFetchingLocation, "Should not be fetching location initially")
+        #expect(!store.state.isFetchingWeather, "Should not be fetching weather initially")
+        #expect(store.state.statusMessage == "", "Status message should be empty initially")
+
+        // Simulate location change
+        let mockLocation = CLLocation(latitude: 37.7749, longitude: -122.4194)
+        await store.send(.locationChanged(mockLocation)) {
+            $0.isAPIKeyMissing = false  // API key status changes after location change
+            $0.isFetchingWeather = true
+            $0.statusMessage = "Fetching weather data..."
+        }
+
+        // Check final state
+        #expect(!store.state.isAPIKeyMissing, "API key should not be missing after location change")
+        #expect(!store.state.showWeather, "Weather should not be shown yet")
+        #expect(!store.state.isFetchingLocation, "Should not be fetching location after location change")
+        #expect(store.state.isFetchingWeather, "Should be fetching weather after location change")
+        #expect(store.state.statusMessage == "Fetching weather data...", "Status message should indicate fetching weather")
+
+        await store.finish()
+    }
+
+    @Test
+    func testValidAPIKey() async throws {
+        let store = TestStore(initialState: ContentViewFeature.State(
+            weatherViewModel: WeatherViewModel(),
+            hasNoCachedData: true,
+            isAPIKeyMissing: false
+        )) {
+            ContentViewFeature()
+        }
+
+        store.exhaustivity = .off
+
+        await store.send(.onAppear)
+
+        await store.send(.checkAPIKeyStatus)
+
+        // Simulate location change
+        let mockLocation = CLLocation(latitude: 37.7749, longitude: -122.4194)
+        await store.send(.locationChanged(mockLocation))
+
+        // Check intermediate state
+        #expect(!store.state.isAPIKeyMissing, "API key should be valid")
+        #expect(store.state.isFetchingWeather, "Should be fetching weather")
+
+        // Simulate weather fetched
+        let mockWeather = CachedWeatherData(cityName: "San Francisco", temperature: 18.0)
+        await store.send(.weatherFetched(mockWeather)) {
+            $0.showWeather = true
+            $0.isFetchingWeather = false
+        }
+
+        // Check final state
+        #expect(!store.state.isAPIKeyMissing, "API key should be valid")
+        #expect(store.state.showWeather, "Weather should be shown when API key is valid")
+        #expect(!store.state.isFetchingWeather, "Should not be fetching weather after data is received")
+
+        await store.finish()
+    }
 }
