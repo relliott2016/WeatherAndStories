@@ -79,8 +79,16 @@ Each feature is composed of:
    ```
    git clone https://github.com/relliott2016/weather-stories-app.git
    ```
-2. Open `WeatherAndStories.xcodeproj` in Xcode.
-3. Build and run the project on your preferred iPhone or iPad simulator or device.
+2. Obtain an API key from OpenWeatherMap:
+   - Go to https://openweathermap.org and create an account if you don't have one.
+   - Once logged in, go to your API keys section and generate a new API key.
+3. Add the API key to the project:
+   - Open the project in Xcode.
+   - Locate the Info.plist file in the project navigator.
+   - Add a new entry with the key OPENWEATHERMAP_API_KEY.
+   - Set the value of this entry to your API key obtained from OpenWeatherMap.
+4. Open `WeatherAndStories.xcodeproj` in Xcode.
+5. Build and run the project on your preferred iPhone or iPad simulator or device.
 
 ## Requirements
 
