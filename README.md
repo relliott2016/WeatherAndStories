@@ -100,6 +100,7 @@ Each feature is composed of:
 - SwiftUI
 - CoreLocation
 - SwiftData
+- Swift Testing
 
 ## License
 
