@@ -29,16 +29,16 @@
 		F8050FB92CBC104200F7EAC6 /* Exceptions for "WeatherAndStories" folder in "WeatherAndStoriesTests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Managers/LocationManager.swift,
-				Models/OpenWeather.swift,
-				Utilities/Config.swift,
-				Utilities/GlobalConstants.swift,
-				Utilities/NetworkMonitor.swift,
-				ViewModels/WeatherViewModel.swift,
-				Views/ContentView/ContentView.swift,
-				Views/ContentView/ContentViewFeature.swift,
-				Views/StoryView/StoryView.swift,
-				Views/StoryView/StoryViewFeature.swift,
+				App/Config.swift,
+				Core/GlobalConstants.swift,
+				Core/LocationManager.swift,
+				Core/NetworkMonitor.swift,
+				Screens/Models/OpenWeather.swift,
+				Screens/ViewModels/WeatherViewModel.swift,
+				Screens/Views/ContentView/ContentView.swift,
+				Screens/Views/ContentView/ContentViewFeature.swift,
+				Screens/Views/StoryView/StoryView.swift,
+				Screens/Views/StoryView/StoryViewFeature.swift,
 			);
 			target = F876B5F02CB8108D00304862 /* WeatherAndStoriesTests */;
 		};
